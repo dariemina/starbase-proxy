@@ -45,22 +45,22 @@
   .ees-pills {
     display:flex; gap:6px; padding:7px 14px;
     border-bottom:1px solid rgba(255,255,255,.06);
-    background:rgba(0,0,0,.15); flex-wrap:wrap;
+    background:rgba(0,0,0,.15); flex-wrap:wrap; align-items:center;
   }
   .pill {
     display:inline-flex; align-items:center; gap:5px;
-    padding:3px 9px; border-radius:20px;
-    font-size:9.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
-    border:1px solid; transition:opacity .3s;
+    padding:4px 10px; border-radius:20px;
+    font-size:10px; font-weight:600; letter-spacing:.05em;
+    border:1px solid; white-space:nowrap;
   }
   .pill__dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-  .pill--open   { color:#00d46a; border-color:rgba(0,212,106,.3); background:rgba(0,200,100,.1); }
+  .pill--open   { color:#00d46a; border-color:rgba(0,212,106,.3);  background:rgba(0,200,100,.1); }
   .pill--open   .pill__dot { background:#00d46a; animation:pulse 1.8s ease-in-out infinite; }
-  .pill--closed { color:#ff5050; border-color:rgba(255,80,80,.3);  background:rgba(255,80,80,.1); }
-  .pill--closed .pill__dot { background:#ff5050; }
-  .pill--warn   { color:#ffa040; border-color:rgba(255,160,64,.3); background:rgba(255,160,64,.1); }
-  .pill--warn   .pill__dot { background:#ffa040; }
-  .pill--loading { color:rgba(255,255,255,.3); border-color:rgba(255,255,255,.1); background:transparent; }
+  .pill--closed { color:#ff5050; border-color:rgba(255,80,80,.3);   background:rgba(255,80,80,.1); }
+  .pill--closed .pill__dot { background:#ff5050; animation:pulse 1.8s ease-in-out infinite; }
+  .pill--warn   { color:#ffa040; border-color:rgba(255,160,64,.3);  background:rgba(255,160,64,.1); }
+  .pill--warn   .pill__dot { background:#ffa040; animation:pulse 1.8s ease-in-out infinite; }
+  .pill--dim    { color:rgba(255,255,255,.3); border-color:rgba(255,255,255,.08); background:transparent; }
 
   /* TABS */
   .ees-tabs { display:flex; border-bottom:1px solid rgba(255,255,255,.06); }
@@ -133,34 +133,25 @@
 <body style="margin:0;padding:1rem;background:#0a0a0f;">
 
 <div class="ees-ticker">
-
-  <!-- Header -->
   <div class="ees-header">
     <span class="ees-rocket">🚀</span>
-    <div class="ees-label">
-      CIERRES EN STARBASE
-      <span>Boca Chica · Cameron County · Texas</span>
-    </div>
-    <div class="ees-dot" id="dot"></div>
+    <div class="ees-label">CIERRES EN STARBASE<span>Boca Chica · Cameron County · Texas</span></div>
+    <div class="ees-dot"></div>
   </div>
 
-  <!-- Status pills from starbase.texas.gov -->
   <div class="ees-pills" id="pills">
-    <span class="pill pill--loading"><span class="pill__dot"></span>Cargando estado…</span>
+    <span class="pill pill--dim"><span class="pill__dot" style="background:rgba(255,255,255,.2)"></span>Cargando estado…</span>
   </div>
 
-  <!-- Tabs -->
   <div class="ees-tabs">
     <button class="ees-tab active" id="tab-hoy"      onclick="switchTab('hoy')">⚡ Hoy</button>
     <button class="ees-tab"        id="tab-proximos" onclick="switchTab('proximos')">📅 Próximos</button>
   </div>
 
-  <!-- Scrolling track -->
   <div class="ees-track" id="track">
     <div class="ees-loading"><div class="spinner"></div><span>Cargando…</span></div>
   </div>
 
-  <!-- Footer -->
   <div class="ees-footer">
     <span class="ees-source">
       <a href="https://www.starbase.texas.gov/beach-road-access" target="_blank">starbase.texas.gov</a>
@@ -175,7 +166,7 @@
 // ══════════════════════════════════════════════════
 // 🔧 CAMBIA POR TU URL DE RAILWAY
 // ══════════════════════════════════════════════════
-const BASE = 'web-production-7f184.up.railway.app';
+const BASE = 'https://TU-PROXY.up.railway.app';
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -189,75 +180,75 @@ function fmtDate(s) {
 function traducir(t) {
   if (!t) return '';
   return t
-    .replace(/boca chica beach/gi, 'Playa Boca Chica')
-    .replace(/beach is open/gi,    'playa abierta')
-    .replace(/beach/gi,            'playa')
-    .replace(/road closure/gi,     'cierre de carretera')
-    .replace(/no road delay\.?/gi, 'Sin demoras en carretera')
-    .replace(/road delay/gi,       'demora en carretera')
-    .replace(/road/gi,             'carretera')
-    .replace(/closure/gi,          'cierre')
-    .replace(/state highway\s*/gi, 'Carr. Estatal ')
-    .replace(/highway/gi,          'carretera')
-    .replace(/production/gi,       'producción')
-    .replace(/\bto\b/gi,           'a')
-    .replace(/\bfrom\b/gi,         'desde')
-    .replace(/entrance/gi,         'entrada')
-    .replace(/access/gi,           'acceso')
-    .replace(/no delays?\.?/gi,    'sin demoras')
+    .replace(/boca chica beach/gi,    'Playa Boca Chica')
+    .replace(/beach is open\.?/gi,    'playa abierta')
+    .replace(/beach/gi,               'playa')
+    .replace(/road closure/gi,        'cierre de carretera')
+    .replace(/no road delay\.?/gi,    'Sin demoras en carretera')
+    .replace(/road delay/gi,          'demora en carretera')
+    .replace(/road/gi,                'carretera')
+    .replace(/closure/gi,             'cierre')
+    .replace(/state highway\s*/gi,    'Carr. Estatal ')
+    .replace(/highway/gi,             'carretera')
+    .replace(/production/gi,          'producción')
+    .replace(/\bto\b/gi,              'a')
+    .replace(/\bfrom\b/gi,            'desde')
+    .replace(/entrance/gi,            'entrada')
+    .replace(/access/gi,              'acceso')
+    .replace(/no delays?\.?/gi,       'sin demoras')
     .replace(/no public notices?[^.]*/gi, 'sin avisos públicos')
-    .replace(/delay/gi,            'demora')
-    .replace(/masseys/gi,          'Massey')
-    .replace(/is open\.?/gi,       'abierta');
+    .replace(/delay/gi,               'demora')
+    .replace(/masseys/gi,             'Massey')
+    .replace(/is open\.?/gi,          'abierta');
 }
 
-// ── Status pills ────────────────────────────────
+// ── Status pills (solo playa + carretera) ────────
 async function cargarEstado() {
   try {
     const res  = await fetch(BASE + '/estado');
     const data = await res.json();
 
-    const beachText  = (data.beach  || '').toLowerCase();
-    const roadText   = (data.road   || '').toLowerCase();
-    const noticeText = (data.notice || '').toLowerCase();
+    console.log('Estado recibido:', data); // debug en consola del browser
 
-    const beachOpen  = beachText.includes('open')  || beachText.includes('abierta') || beachText.includes('abierto');
-    const roadOk     = roadText.includes('no road delay') || roadText.includes('no delay') || roadText.includes('sin demora');
-    const hasNotice  = !noticeText.includes('no public') && !noticeText.includes('sin aviso') && noticeText.length > 5;
+    const beachRaw = (data.beach || '').trim();
+    const roadRaw  = (data.road  || '').trim();
+    const beachLo  = beachRaw.toLowerCase();
+    const roadLo   = roadRaw.toLowerCase();
 
-    const pillsEl = document.getElementById('pills');
-    pillsEl.innerHTML = `
+    const beachOpen = beachLo.includes('open') || beachLo.includes('abierta') || beachLo.includes('abierto');
+    const roadOk    = roadLo.includes('no road delay') || roadLo.includes('no delay') || roadLo.includes('sin demora');
+
+    // Texto de la carretera: si hay demora, mostrarla traducida; si no, mensaje limpio
+    const roadLabel = roadOk
+      ? 'Sin demoras'
+      : (traducir(roadRaw) || 'Demora activa');
+
+    document.getElementById('pills').innerHTML = `
       <span class="pill ${beachOpen ? 'pill--open' : 'pill--closed'}">
         <span class="pill__dot"></span>
         🏖 Playa: ${beachOpen ? 'Abierta' : 'Cerrada'}
       </span>
       <span class="pill ${roadOk ? 'pill--open' : 'pill--warn'}">
         <span class="pill__dot"></span>
-        🛣 Carretera: ${roadOk ? 'Sin demoras' : traducir(data.road)}
+        🛣 Carretera: ${roadLabel}
       </span>
-      ${hasNotice ? `<span class="pill pill--warn">
-        <span class="pill__dot"></span>
-        📋 ${traducir(data.notice).substring(0, 60)}
-      </span>` : ''}
     `;
   } catch(e) {
+    console.error('Error cargando estado:', e);
     document.getElementById('pills').innerHTML =
-      `<span class="pill pill--loading"><span class="pill__dot"></span>Estado no disponible</span>`;
+      `<span class="pill pill--dim"><span class="pill__dot" style="background:rgba(255,255,255,.2)"></span>Estado no disponible</span>`;
   }
 }
 
-// ── Ticker ──────────────────────────────────────
-let tabActual   = 'hoy';
-let cacheHoy    = null;
-let cacheProx   = null;
+// ── Ticker scrolling ─────────────────────────────
+let tabActual = 'hoy';
+let cacheHoy  = null;
+let cacheProx = null;
 
 function renderItems(items, esProximo) {
   const track = document.getElementById('track');
   if (!items || items.length === 0) {
-    items = [{
-      texto: esProximo ? '📅 Sin cierres programados próximamente' : '✅ Sin cierres activos hoy',
-      badge: 'open'
-    }];
+    items = [{ texto: esProximo ? '📅 Sin cierres programados próximamente' : '✅ Sin cierres activos hoy — carretera y playa abiertas', badge:'open' }];
   }
   const sep  = `<span class="ees-sep"></span>`;
   const html = (arr) => arr.map(i => `
@@ -266,7 +257,6 @@ function renderItems(items, esProximo) {
       ${i.fecha ? `<span class="fecha">${i.fecha}</span>` : ''}
       <span class="badge badge--${i.badge}">${i.badge==='open'?'ABIERTO':i.badge==='closed'?'CERRADO':'PROGRAMADO'}</span>
     </span>${sep}`).join('');
-
   track.innerHTML = `<div class="ees-scroll" id="scroll">${html(items)+html(items)}</div>`;
   const scroll = document.getElementById('scroll');
   scroll.style.animationDuration = Math.max(20, items.length * 14) + 's';
@@ -296,15 +286,11 @@ async function cargarProximos() {
     const raw  = Array.isArray(data) ? data : (data.closures || data.data || []);
     const ahora = Date.now();
     const fut = raw.filter(c => new Date(c.startDate||c.start||c.date_start||0) > ahora);
-    cacheProx = fut.slice(0,10).map(c => {
-      const start = fmtDate(c.startDate||c.start||c.date_start);
-      const end   = fmtDate(c.endDate||c.end||c.date_end);
-      return {
-        texto: traducir(c.description||c.desc||c.title||'Cierre programado'),
-        fecha: [start,end].filter(Boolean).join(' — ') || null,
-        badge: 'upcoming'
-      };
-    });
+    cacheProx = fut.slice(0,10).map(c => ({
+      texto: traducir(c.description||c.desc||c.title||'Cierre programado'),
+      fecha: [fmtDate(c.startDate||c.start||c.date_start), fmtDate(c.endDate||c.end||c.date_end)].filter(Boolean).join(' — ') || null,
+      badge: 'upcoming'
+    }));
     renderItems(cacheProx, true);
   } catch(e) { renderItems([], true); }
 }
@@ -324,15 +310,12 @@ function actualizarTs() {
     `ACT. ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;
 }
 
-// ── Init ─────────────────────────────────────────
 cargarEstado();
 cargarHoy();
 actualizarTs();
 setInterval(() => {
   cacheHoy = null; cacheProx = null;
-  cargarEstado();
-  switchTab(tabActual);
-  actualizarTs();
+  cargarEstado(); switchTab(tabActual); actualizarTs();
 }, 5 * 60 * 1000);
 </script>
 </body>

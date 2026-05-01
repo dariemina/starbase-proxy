@@ -35,43 +35,45 @@ app.get('/estado', async (req, res) => {
     const html = await r.text();
     const $    = cheerio.load(html);
 
-    // Grab the text after each h2 heading
-    let beach  = '';
-    let road   = '';
-    let notice = '';
-
+    // Strategy: find every h2, then grab ALL text nodes until the next h2
+    const sections = {};
     $('h2').each((_, el) => {
-      const heading = $(el).text().trim().toLowerCase();
-      // The content is the next sibling paragraph or the text directly after
-      const next = $(el).next();
-      const text = next.text().trim() || $(el).parent().text().replace($(el).text(), '').trim();
-
-      if (heading.includes('beach access'))  beach  = text;
-      if (heading.includes('road update'))   road   = text;
-      if (heading.includes('public notice')) notice = text;
+      const heading = $(el).text().trim();
+      // Collect text from all following siblings until next h2
+      let content = '';
+      let node = $(el).next();
+      while (node.length && node[0].name !== 'h2') {
+        const t = node.text().trim();
+        if (t) content += (content ? ' ' : '') + t;
+        node = node.next();
+      }
+      // Also try: text directly inside parent section/div after the h2
+      if (!content) {
+        content = $(el).parent().clone().children('h2').remove().end().text().trim();
+      }
+      sections[heading.toLowerCase()] = content || '';
     });
 
-    // Fallback: search all text nodes for known patterns
-    if (!beach) {
-      const bodyText = $('body').text();
-      const beachMatch  = bodyText.match(/Boca Chica Beach[^\.\n]*/i);
-      const roadMatch   = bodyText.match(/No Road Delay[^\.\n]*|Road Delay[^\.\n]*/i);
-      const noticeMatch = bodyText.match(/No public notices[^\.\n]*|Public Notice[^\.\n]*/i);
-      if (beachMatch)  beach  = beachMatch[0].trim();
-      if (roadMatch)   road   = roadMatch[0].trim();
-      if (noticeMatch) notice = noticeMatch[0].trim();
-    }
+    console.log('Sections found:', JSON.stringify(sections, null, 2));
+
+    // Match by partial key
+    const findSection = (keyword) => {
+      const key = Object.keys(sections).find(k => k.includes(keyword));
+      return key ? sections[key] : '';
+    };
+
+    const beach  = findSection('beach access') || findSection('beach');
+    const road   = findSection('road update')  || findSection('road');
 
     res.json({
-      beach:  beach  || 'No disponible',
-      road:   road   || 'No disponible',
-      notice: notice || 'Sin avisos públicos',
-      source: 'https://www.starbase.texas.gov/beach-road-access',
+      beach:     beach || 'No disponible',
+      road:      road  || 'No disponible',
+      source:    'https://www.starbase.texas.gov/beach-road-access',
       fetchedAt: new Date().toISOString()
     });
   } catch (err) {
     console.error('Scrape error:', err.message);
-    res.status(502).json({ error: 'No se pudo obtener el estado de Starbase.' });
+    res.status(502).json({ error: 'No se pudo obtener el estado.' });
   }
 });
 
