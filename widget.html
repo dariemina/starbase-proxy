@@ -12,11 +12,9 @@
     width:100%;
     background: linear-gradient(135deg, #0d1117 0%, #0f1923 100%);
     border: 1px solid rgba(255,140,0,0.25);
-    border-radius: 4px;
-    overflow: hidden;
+    border-radius: 4px; overflow:hidden;
     box-shadow: 0 0 0 1px rgba(255,140,0,0.08), 0 4px 24px rgba(0,0,0,0.6);
-    font-family: 'Exo 2', sans-serif;
-    position: relative;
+    font-family: 'Exo 2', sans-serif; position:relative;
   }
   .ees-ticker::before {
     content:''; position:absolute; inset:0; pointer-events:none; z-index:10;
@@ -24,109 +22,60 @@
   }
 
   /* HEADER */
-  .ees-header {
-    display:flex; align-items:center; gap:10px; padding:7px 14px;
-    background: linear-gradient(90deg, #c8102e, #a00d24);
-  }
+  .ees-header { display:flex; align-items:center; gap:10px; padding:7px 14px; background:linear-gradient(90deg,#c8102e,#a00d24); }
   .ees-rocket { font-size:16px; flex-shrink:0; animation:bob 2s ease-in-out infinite; }
   @keyframes bob { 0%,100%{transform:translateY(0) rotate(-45deg)} 50%{transform:translateY(-3px) rotate(-45deg)} }
-  .ees-label {
-    font-family:'Orbitron',monospace; font-size:9px; font-weight:700;
-    letter-spacing:.18em; color:rgba(255,255,255,.95); text-transform:uppercase; line-height:1;
-  }
+  .ees-label { font-family:'Orbitron',monospace; font-size:9px; font-weight:700; letter-spacing:.18em; color:rgba(255,255,255,.95); text-transform:uppercase; line-height:1; }
   .ees-label span { display:block; font-size:7px; font-weight:400; letter-spacing:.2em; opacity:.8; margin-top:2px; }
-  .ees-dot {
-    width:7px; height:7px; border-radius:50%; background:#fff;
-    margin-left:auto; flex-shrink:0; animation:pulse 1.8s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,255,255,.5)} 50%{opacity:.5;box-shadow:0 0 0 4px rgba(255,255,255,0)} }
+  .ees-dot { width:7px; height:7px; border-radius:50%; background:#fff; margin-left:auto; flex-shrink:0; animation:dpulse 1.8s ease-in-out infinite; }
+  @keyframes dpulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,255,255,.5)} 50%{opacity:.5;box-shadow:0 0 0 4px rgba(255,255,255,0)} }
 
-  /* STATUS PILLS */
-  .ees-pills {
-    display:flex; gap:6px; padding:7px 14px;
-    border-bottom:1px solid rgba(255,255,255,.06);
-    background:rgba(0,0,0,.15); flex-wrap:wrap; align-items:center;
-  }
-  .pill {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:4px 10px; border-radius:20px;
-    font-size:10px; font-weight:600; letter-spacing:.05em;
-    border:1px solid; white-space:nowrap;
-  }
-  .pill__dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  /* PILLS */
+  .ees-pills { display:flex; gap:6px; padding:7px 14px; border-bottom:1px solid rgba(255,255,255,.06); background:rgba(0,0,0,.15); flex-wrap:wrap; align-items:center; }
+  .pill { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:600; letter-spacing:.05em; border:1px solid; white-space:nowrap; }
+  .pill__dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; animation:dpulse 1.8s ease-in-out infinite; }
   .pill--open   { color:#00d46a; border-color:rgba(0,212,106,.3);  background:rgba(0,200,100,.1); }
-  .pill--open   .pill__dot { background:#00d46a; animation:pulse 1.8s ease-in-out infinite; }
-  .pill--closed { color:#ff5050; border-color:rgba(255,80,80,.3);   background:rgba(255,80,80,.1); }
-  .pill--closed .pill__dot { background:#ff5050; animation:pulse 1.8s ease-in-out infinite; }
-  .pill--warn   { color:#ffa040; border-color:rgba(255,160,64,.3);  background:rgba(255,160,64,.1); }
-  .pill--warn   .pill__dot { background:#ffa040; animation:pulse 1.8s ease-in-out infinite; }
+  .pill--open   .pill__dot { background:#00d46a; }
+  .pill--closed { color:#ff5050; border-color:rgba(255,80,80,.3);  background:rgba(255,80,80,.1); }
+  .pill--closed .pill__dot { background:#ff5050; }
+  .pill--warn   { color:#ffa040; border-color:rgba(255,160,64,.3); background:rgba(255,160,64,.1); }
+  .pill--warn   .pill__dot { background:#ffa040; }
   .pill--dim    { color:rgba(255,255,255,.3); border-color:rgba(255,255,255,.08); background:transparent; }
+  .pill--dim    .pill__dot { background:rgba(255,255,255,.2); animation:none; }
 
   /* TABS */
   .ees-tabs { display:flex; border-bottom:1px solid rgba(255,255,255,.06); }
-  .ees-tab {
-    flex:1; padding:6px 10px; text-align:center;
-    font-family:'Orbitron',monospace; font-size:7.5px; font-weight:600;
-    letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
-    color:rgba(255,255,255,.3); border:none; background:transparent;
-    border-bottom:2px solid transparent; transition:all .2s;
-  }
-  .ees-tab.active   { color:#ffa040; border-bottom-color:#ffa040; background:rgba(255,160,64,.05); }
+  .ees-tab { flex:1; padding:6px 10px; text-align:center; font-family:'Orbitron',monospace; font-size:7.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; color:rgba(255,255,255,.3); border:none; background:transparent; border-bottom:2px solid transparent; transition:all .2s; }
+  .ees-tab.active { color:#ffa040; border-bottom-color:#ffa040; background:rgba(255,160,64,.05); }
   .ees-tab:hover:not(.active) { color:rgba(255,255,255,.6); }
 
   /* TRACK */
-  .ees-track {
-    display:flex; align-items:center; height:42px; padding:0 12px;
-    overflow:hidden; position:relative;
-  }
-  .ees-track::before,.ees-track::after {
-    content:''; position:absolute; top:0; bottom:0; width:32px; z-index:2; pointer-events:none;
-  }
+  .ees-track { display:flex; align-items:center; height:42px; padding:0 12px; overflow:hidden; position:relative; }
+  .ees-track::before,.ees-track::after { content:''; position:absolute; top:0; bottom:0; width:32px; z-index:2; pointer-events:none; }
   .ees-track::before { left:0;  background:linear-gradient(90deg,#0d1117,transparent); }
   .ees-track::after  { right:0; background:linear-gradient(270deg,#0d1117,transparent); }
-
-  .ees-scroll {
-    display:flex; align-items:center; white-space:nowrap;
-    animation:scrollTicker 30s linear infinite;
-  }
+  .ees-scroll { display:flex; align-items:center; white-space:nowrap; animation:scrollT 30s linear infinite; }
   .ees-scroll.paused { animation-play-state:paused; }
-  @keyframes scrollTicker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-  .ees-item {
-    display:inline-flex; align-items:center; gap:8px; padding:0 24px;
-    font-size:12.5px; font-weight:400; color:#c8d8e8; letter-spacing:.02em;
-  }
+  @keyframes scrollT { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ees-item { display:inline-flex; align-items:center; gap:8px; padding:0 24px; font-size:12.5px; font-weight:400; color:#c8d8e8; letter-spacing:.02em; }
   .ees-item strong { font-weight:600; color:#ffa040; }
   .ees-item .fecha { color:rgba(255,255,255,.4); font-size:11px; }
   .ees-sep { display:inline-block; width:4px; height:4px; border-radius:50%; background:rgba(255,140,0,.4); margin:0 4px; flex-shrink:0; }
-
-  .badge {
-    display:inline-block; padding:2px 7px; border-radius:3px;
-    font-size:9px; font-weight:700; letter-spacing:.1em;
-    text-transform:uppercase; vertical-align:middle; margin-left:4px; flex-shrink:0;
-  }
+  .badge { display:inline-block; padding:2px 7px; border-radius:3px; font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; vertical-align:middle; margin-left:4px; flex-shrink:0; }
   .badge--open     { background:rgba(0,200,100,.15);  color:#00d46a; border:1px solid rgba(0,212,106,.3); }
-  .badge--closed   { background:rgba(255,80,80,.15);   color:#ff5050; border:1px solid rgba(255,80,80,.3); }
-  .badge--upcoming { background:rgba(255,160,64,.15);  color:#ffa040; border:1px solid rgba(255,160,64,.3); }
+  .badge--closed   { background:rgba(255,80,80,.15);  color:#ff5050; border:1px solid rgba(255,80,80,.3); }
+  .badge--upcoming { background:rgba(255,160,64,.15); color:#ffa040; border:1px solid rgba(255,160,64,.3); }
+  .badge--warn     { background:rgba(255,160,64,.15); color:#ffa040; border:1px solid rgba(255,160,64,.3); }
 
   /* FOOTER */
-  .ees-footer {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:5px 14px; border-top:1px solid rgba(255,255,255,.04); background:rgba(0,0,0,.2);
-  }
+  .ees-footer { display:flex; align-items:center; justify-content:space-between; padding:5px 14px; border-top:1px solid rgba(255,255,255,.04); background:rgba(0,0,0,.2); }
   .ees-source { font-size:9px; color:rgba(255,255,255,.25); letter-spacing:.08em; }
   .ees-source a { color:rgba(255,160,64,.5); text-decoration:none; }
   .ees-ts { font-size:9px; font-family:'Orbitron',monospace; color:rgba(255,255,255,.2); letter-spacing:.06em; }
 
   /* LOADING */
-  .ees-loading {
-    display:flex; align-items:center; gap:10px;
-    padding:0 20px; height:42px; font-size:12px; color:rgba(255,255,255,.4);
-  }
-  .spinner {
-    width:14px; height:14px; border:2px solid rgba(255,160,64,.2);
-    border-top-color:#ffa040; border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0;
-  }
+  .ees-loading { display:flex; align-items:center; gap:10px; padding:0 20px; height:42px; font-size:12px; color:rgba(255,255,255,.4); }
+  .spinner { width:14px; height:14px; border:2px solid rgba(255,160,64,.2); border-top-color:#ffa040; border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 </style>
 </head>
@@ -138,20 +87,16 @@
     <div class="ees-label">CIERRES EN STARBASE<span>Boca Chica · Cameron County · Texas</span></div>
     <div class="ees-dot"></div>
   </div>
-
   <div class="ees-pills" id="pills">
-    <span class="pill pill--dim"><span class="pill__dot" style="background:rgba(255,255,255,.2)"></span>Cargando estado…</span>
+    <span class="pill pill--dim"><span class="pill__dot"></span>Cargando estado…</span>
   </div>
-
   <div class="ees-tabs">
     <button class="ees-tab active" id="tab-hoy"      onclick="switchTab('hoy')">⚡ Hoy</button>
     <button class="ees-tab"        id="tab-proximos" onclick="switchTab('proximos')">📅 Próximos</button>
   </div>
-
   <div class="ees-track" id="track">
     <div class="ees-loading"><div class="spinner"></div><span>Cargando…</span></div>
   </div>
-
   <div class="ees-footer">
     <span class="ees-source">
       <a href="https://www.starbase.texas.gov/beach-road-access" target="_blank">starbase.texas.gov</a>
@@ -166,89 +111,107 @@
 // ══════════════════════════════════════════════════
 // 🔧 CAMBIA POR TU URL DE RAILWAY
 // ══════════════════════════════════════════════════
-const BASE = 'https://web-production-7f184.up.railway.app/';
+const BASE = 'https://TU-PROXY.up.railway.app';
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-function fmtDate(s) {
-  if (!s) return null;
-  const d = new Date(s);
-  if (isNaN(d)) return s;
-  return `${d.getDate()} ${MESES[d.getMonth()]} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} CDT`;
-}
-
-function traducir(t) {
+function traducirDesc(t) {
   if (!t) return '';
   return t
-    .replace(/boca chica beach/gi,    'Playa Boca Chica')
-    .replace(/beach is open\.?/gi,    'playa abierta')
-    .replace(/beach/gi,               'playa')
-    .replace(/road closure/gi,        'cierre de carretera')
-    .replace(/no road delay\.?/gi,    'Sin demoras en carretera')
-    .replace(/road delay/gi,          'demora en carretera')
-    .replace(/road/gi,                'carretera')
-    .replace(/closure/gi,             'cierre')
-    .replace(/state highway\s*/gi,    'Carr. Estatal ')
-    .replace(/highway/gi,             'carretera')
-    .replace(/production/gi,          'producción')
-    .replace(/\bto\b/gi,              'a')
-    .replace(/\bfrom\b/gi,            'desde')
-    .replace(/entrance/gi,            'entrada')
-    .replace(/access/gi,              'acceso')
-    .replace(/no delays?\.?/gi,       'sin demoras')
-    .replace(/no public notices?[^.]*/gi, 'sin avisos públicos')
-    .replace(/delay/gi,               'demora')
-    .replace(/masseys/gi,             'Massey')
-    .replace(/is open\.?/gi,          'abierta');
+    .replace(/production/gi, 'Producción')
+    .replace(/masseys/gi,    'Massey')
+    .replace(/\bto\b/gi,     'a')
+    .replace(/\bfrom\b/gi,   'desde')
+    .replace(/entrance/gi,   'entrada')
+    .replace(/beach/gi,      'playa')
+    .replace(/road/gi,       'carretera');
 }
 
-// ── Status pills (solo playa + carretera) ────────
+// Convierte "MAY 1 10:00 AM TO MAY 1 2:00 PM" → "1 may 10:00 AM — 1 may 2:00 PM"
+function traducirFecha(f) {
+  if (!f) return '';
+  const MMAP = { january:'ene', february:'feb', march:'mar', april:'abr',
+    may:'may', june:'jun', july:'jul', august:'ago',
+    september:'sep', october:'oct', november:'nov', december:'dic' };
+  return f
+    .replace(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/gi,
+      (m) => MMAP[m.toLowerCase()] || m)
+    .replace(/\bto\b/gi, '—');
+}
+
+// ── Status pills ─────────────────────────────────
 async function cargarEstado() {
   try {
     const res  = await fetch(BASE + '/estado');
     const data = await res.json();
+    console.log('Estado:', data);
 
-    console.log('Estado recibido:', data); // debug en consola del browser
-
-    const beachRaw = (data.beach || '').trim();
-    const roadRaw  = (data.road  || '').trim();
-    const beachLo  = beachRaw.toLowerCase();
-    const roadLo   = roadRaw.toLowerCase();
-
+    const beachLo   = (data.beach || '').toLowerCase();
     const beachOpen = beachLo.includes('open') || beachLo.includes('abierta') || beachLo.includes('abierto');
-    const roadOk    = roadLo.includes('no road delay') || roadLo.includes('no delay') || roadLo.includes('sin demora');
 
-    // Texto de la carretera: si hay demora, mostrarla traducida; si no, mensaje limpio
-    const roadLabel = roadOk
-      ? 'Sin demoras'
-      : (traducir(roadRaw) || 'Demora activa');
+    const cards = data.roadCards || [];
+    // A delay exists if any card has type === 'delay' or 'raw'
+    const delayCards = cards.filter(c => c.type === 'delay' || c.type === 'raw');
+    const hasDelay   = delayCards.length > 0;
+
+    // Build road pill label
+    let roadLabel = 'Sin demoras';
+    let roadClass = 'pill--open';
+    if (hasDelay) {
+      roadClass = 'pill--warn';
+      const d = delayCards[0];
+      if (d.desc) {
+        roadLabel = `Demora: ${traducirDesc(d.desc)}`;
+        if (d.date) roadLabel += ` · ${traducirFecha(d.date)}`;
+      } else {
+        roadLabel = 'Demora activa';
+      }
+    }
 
     document.getElementById('pills').innerHTML = `
       <span class="pill ${beachOpen ? 'pill--open' : 'pill--closed'}">
         <span class="pill__dot"></span>
         🏖 Playa: ${beachOpen ? 'Abierta' : 'Cerrada'}
       </span>
-      <span class="pill ${roadOk ? 'pill--open' : 'pill--warn'}">
+      <span class="pill ${roadClass}">
         <span class="pill__dot"></span>
-        🛣 Carretera: ${roadLabel}
+        🛣 ${roadLabel}
       </span>
     `;
   } catch(e) {
-    console.error('Error cargando estado:', e);
+    console.error('Error estado:', e);
     document.getElementById('pills').innerHTML =
-      `<span class="pill pill--dim"><span class="pill__dot" style="background:rgba(255,255,255,.2)"></span>Estado no disponible</span>`;
+      `<span class="pill pill--dim"><span class="pill__dot"></span>Estado no disponible</span>`;
   }
 }
 
-// ── Ticker scrolling ─────────────────────────────
-let tabActual = 'hoy';
-let cacheHoy  = null;
-let cacheProx = null;
+// ── Ticker ───────────────────────────────────────
+let tabActual = 'hoy', cacheHoy = null, cacheProx = null;
+
+function fmtDate(s) {
+  if (!s) return null;
+  const d = new Date(s);
+  if (isNaN(d)) return s;
+  return `${d.getDate()} ${MESES[d.getMonth()]} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} CT`;
+}
+
+function traducir(t) {
+  if (!t) return '';
+  return t
+    .replace(/boca chica beach/gi,'Playa Boca Chica').replace(/beach/gi,'playa')
+    .replace(/road closure/gi,'cierre de carretera').replace(/road/gi,'carretera')
+    .replace(/closure/gi,'cierre').replace(/state highway\s*/gi,'Carr. Estatal ')
+    .replace(/highway/gi,'carretera').replace(/production/gi,'producción')
+    .replace(/\bto\b/gi,'a').replace(/\bfrom\b/gi,'desde')
+    .replace(/entrance/gi,'entrada').replace(/access/gi,'acceso')
+    .replace(/no delays?\.?/gi,'sin demoras').replace(/delay/gi,'demora')
+    .replace(/masseys/gi,'Massey').replace(/is open\.?/gi,'abierta');
+}
 
 function renderItems(items, esProximo) {
   const track = document.getElementById('track');
   if (!items || items.length === 0) {
-    items = [{ texto: esProximo ? '📅 Sin cierres programados próximamente' : '✅ Sin cierres activos hoy — carretera y playa abiertas', badge:'open' }];
+    items = [{ texto: esProximo ? '📅 Sin cierres programados próximamente' : '✅ Sin cierres activos hoy', badge:'open' }];
   }
   const sep  = `<span class="ees-sep"></span>`;
   const html = (arr) => arr.map(i => `
@@ -270,10 +233,7 @@ async function cargarHoy() {
     const res  = await fetch(BASE + '/cierres/hoy');
     const data = await res.json();
     const raw  = Array.isArray(data) ? data : (data.closures || data.data || []);
-    cacheHoy = raw.map(c => ({
-      texto: traducir(c.description || c.desc || c.title || 'Cierre'),
-      badge: 'closed'
-    }));
+    cacheHoy = raw.map(c => ({ texto: traducir(c.description||c.desc||c.title||'Cierre'), badge:'closed' }));
     renderItems(cacheHoy, false);
   } catch(e) { renderItems([], false); }
 }
@@ -299,8 +259,7 @@ function switchTab(tab) {
   tabActual = tab;
   document.getElementById('tab-hoy').classList.toggle('active',      tab==='hoy');
   document.getElementById('tab-proximos').classList.toggle('active', tab==='proximos');
-  document.getElementById('track').innerHTML =
-    `<div class="ees-loading"><div class="spinner"></div><span>Cargando…</span></div>`;
+  document.getElementById('track').innerHTML = `<div class="ees-loading"><div class="spinner"></div><span>Cargando…</span></div>`;
   if (tab==='hoy') cargarHoy(); else cargarProximos();
 }
 
@@ -313,10 +272,7 @@ function actualizarTs() {
 cargarEstado();
 cargarHoy();
 actualizarTs();
-setInterval(() => {
-  cacheHoy = null; cacheProx = null;
-  cargarEstado(); switchTab(tabActual); actualizarTs();
-}, 5 * 60 * 1000);
+setInterval(() => { cacheHoy=null; cacheProx=null; cargarEstado(); switchTab(tabActual); actualizarTs(); }, 5*60*1000);
 </script>
 </body>
 </html>
