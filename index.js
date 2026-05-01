@@ -1,6 +1,4 @@
-const express  = require('express');
-const fetch    = require('node-fetch');
-const cheerio  = require('cheerio');
+const express = require('express');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -31,64 +29,37 @@ app.get('/estado', async (req, res) => {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ExplorandoElEspacio/1.0)' }
     });
     const html = await r.text();
-    const $    = cheerio.load(html);
 
-    // ── Dump full visible text (for debugging) ────────────────────────────
-    const fullText = $('body').text().replace(/\s+/g, ' ').trim();
-    console.log('=== FULL PAGE TEXT ===');
-    console.log(fullText.substring(0, 2000));
-    console.log('=== END ===');
+    // Simple text extraction without cheerio — strip all HTML tags
+    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    console.log('PAGE TEXT:', text.substring(0, 2000));
 
-    // ── Beach: look for "Boca Chica Beach is" anywhere in page ───────────
-    const beachMatch = fullText.match(/Boca Chica Beach[^.!]*[.!]/i);
+    // Beach status
+    const beachMatch = text.match(/Boca Chica Beach[^.!?]*/i);
     const beach = beachMatch ? beachMatch[0].trim() : '';
-    console.log('beach extracted:', beach);
+    console.log('beach:', beach);
 
-    // ── Road: extract everything between "Road Updates" and next section ──
-    // Collapse the full text and slice the Road Updates section
-    const roadSectionMatch = fullText.match(/Road Updates?\s*([\s\S]*?)(?:Public Notice|Previous Orders|Other Beaches|Surf Report|$)/i);
+    // Road section: grab everything between "Road Updates" and next section heading
+    const roadSectionMatch = text.match(/Road Updates?\s*(.*?)(?:Public Notice|Previous Orders|Other Beaches|Surf Report)/i);
     const roadSection = roadSectionMatch ? roadSectionMatch[1].trim() : '';
-    console.log('road section raw:', roadSection.substring(0, 500));
+    console.log('roadSection:', roadSection.substring(0, 400));
 
-    // Parse road cards from the section text
-    // Format: "Road Delay DESCRIPTION: X DATE: Y TO Z"
-    // Or just: "No Road Delay."
     const roadCards = [];
-
     if (/no road delay/i.test(roadSection)) {
       roadCards.push({ type: 'none' });
     } else if (/road delay/i.test(roadSection)) {
-      // Extract all Road Delay cards
-      // Each card looks like: "Road Delay DESCRIPTION: ... DATE: ..."
-      const cardPattern = /Road Delay\s+(?:DESCRIPTION:\s*([^\n]*?)\s*)?(?:DATE:\s*([^\n]*?))?(?=Road Delay|$)/gi;
-      let m;
-      while ((m = cardPattern.exec(roadSection)) !== null) {
-        roadCards.push({
-          type: 'delay',
-          desc: (m[1] || '').trim(),
-          date: (m[2] || '').trim()
-        });
-      }
-      // Fallback if pattern didn't match
-      if (roadCards.length === 0) {
-        const descM = roadSection.match(/DESCRIPTION:\s*([^\n]+)/i);
-        const dateM = roadSection.match(/DATE:\s*([^\n]+)/i);
-        roadCards.push({
-          type: 'delay',
-          desc: descM ? descM[1].trim() : '',
-          date: dateM ? dateM[1].trim() : ''
-        });
-      }
+      const descM = roadSection.match(/DESCRIPTION[:\s]+([^D]+?)(?=DATE|$)/i);
+      const dateM = roadSection.match(/DATE[:\s]+([^\n]+)/i);
+      roadCards.push({
+        type: 'delay',
+        desc: descM ? descM[1].trim() : '',
+        date: dateM ? dateM[1].trim() : ''
+      });
     }
 
     console.log('roadCards:', JSON.stringify(roadCards));
 
-    res.json({
-      beach,
-      roadCards,
-      debug: { roadSection: roadSection.substring(0, 300) },
-      fetchedAt: new Date().toISOString()
-    });
+    res.json({ beach, roadCards, fetchedAt: new Date().toISOString() });
 
   } catch (err) {
     console.error('Scrape error:', err.message);
