@@ -7,227 +7,71 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Barlow+Condensed:wght@300;400;500;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-
   :root {
-    --red:    #c8102e;
-    --red2:   #8a0a1f;
-    --orange: #ff6b35;
-    --green:  #00e676;
-    --warn:   #ffab00;
-    --bg:     #080c12;
-    --bg2:    #0d1320;
-    --border: rgba(255,255,255,0.07);
-    --text:   #b8cce0;
+    --red:#c8102e; --red2:#8a0a1f; --orange:#ff6b35;
+    --green:#00e676; --warn:#ffab00;
+    --bg:#080c12; --bg2:#0d1320; --border:rgba(255,255,255,0.07); --text:#b8cce0;
   }
+  body { background:var(--bg); }
 
-  body { background: var(--bg); }
+  .sb { width:100%; background:var(--bg); border:1px solid rgba(200,16,46,0.3); border-radius:3px; overflow:hidden; font-family:'Barlow Condensed',sans-serif; box-shadow:0 0 40px rgba(200,16,46,0.08),0 2px 20px rgba(0,0,0,0.7); position:relative; }
 
-  /* ── WRAPPER ── */
-  .sb {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid rgba(200,16,46,0.3);
-    border-radius: 3px;
-    overflow: hidden;
-    font-family: 'Barlow Condensed', sans-serif;
-    box-shadow: 0 0 40px rgba(200,16,46,0.08), 0 2px 20px rgba(0,0,0,0.7);
-    position: relative;
-  }
+  /* HEADER */
+  .sb__head { display:flex; align-items:center; padding:0; background:linear-gradient(90deg,var(--red) 0%,var(--red2) 60%,#050810 100%); position:relative; overflow:hidden; }
+  .sb__head::after { content:'STARBASE'; position:absolute; right:14px; top:50%; transform:translateY(-50%); font-family:'Orbitron',monospace; font-size:28px; font-weight:700; color:rgba(255,255,255,0.04); letter-spacing:.08em; pointer-events:none; }
+  .sb__rocket { font-size:18px; padding:9px 12px; animation:bob 3s ease-in-out infinite; flex-shrink:0; }
+  @keyframes bob { 0%,100%{transform:translateY(0) rotate(-42deg)} 50%{transform:translateY(-4px) rotate(-42deg)} }
+  .sb__title { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; letter-spacing:.2em; color:rgba(255,255,255,.9); text-transform:uppercase; line-height:1.2; }
+  .sb__title span { display:block; font-size:7px; font-weight:500; letter-spacing:.22em; color:rgba(255,255,255,.55); margin-top:2px; }
+  .sb__live { display:flex; align-items:center; gap:5px; margin-left:auto; margin-right:16px; flex-shrink:0; }
+  .sb__live-dot { width:6px; height:6px; border-radius:50%; background:#fff; animation:lpulse 1.6s ease-in-out infinite; }
+  @keyframes lpulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,255,255,.6)} 50%{opacity:.4;box-shadow:0 0 0 5px rgba(255,255,255,0)} }
+  .sb__live-label { font-family:'Orbitron',monospace; font-size:7px; font-weight:700; letter-spacing:.18em; color:rgba(255,255,255,.6); text-transform:uppercase; }
 
-  /* ── HEADER ── */
-  .sb__head {
-    display: flex;
-    align-items: center;
-    padding: 0;
-    background: linear-gradient(90deg, var(--red) 0%, var(--red2) 60%, #050810 100%);
-    position: relative;
-    overflow: hidden;
-  }
-  .sb__head::after {
-    content: 'STARBASE';
-    position: absolute; right: 14px; top: 50%;
-    transform: translateY(-50%);
-    font-family: 'Orbitron', monospace;
-    font-size: 28px; font-weight: 700;
-    color: rgba(255,255,255,0.04);
-    letter-spacing: .08em;
-    pointer-events: none;
-  }
-  .sb__rocket {
-    font-size: 18px;
-    padding: 9px 12px;
-    animation: bob 3s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  @keyframes bob {
-    0%,100% { transform: translateY(0) rotate(-42deg); }
-    50%      { transform: translateY(-4px) rotate(-42deg); }
-  }
-  .sb__title {
-    font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: .2em;
-    color: rgba(255,255,255,.9);
-    text-transform: uppercase;
-    line-height: 1.2;
-  }
-  .sb__title span {
-    display: block;
-    font-size: 7px; font-weight: 500;
-    letter-spacing: .22em;
-    color: rgba(255,255,255,.55);
-    margin-top: 2px;
-  }
-  .sb__live {
-    display: flex; align-items: center; gap: 5px;
-    margin-left: auto; margin-right: 16px; flex-shrink: 0;
-  }
-  .sb__live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #fff;
-    animation: livepulse 1.6s ease-in-out infinite;
-  }
-  @keyframes livepulse {
-    0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(255,255,255,.6); }
-    50%      { opacity:.4; box-shadow: 0 0 0 5px rgba(255,255,255,0); }
-  }
-  .sb__live-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 7px; font-weight: 700;
-    letter-spacing: .18em;
-    color: rgba(255,255,255,.6);
-    text-transform: uppercase;
-  }
+  /* STATUS */
+  .sb__status { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--border); }
+  .sb__status-cell { display:flex; flex-direction:column; padding:10px 16px; position:relative; transition:background .3s; }
+  .sb__status-cell:first-child { border-right:1px solid var(--border); }
+  .sb__status-cell__label { font-size:8px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.3); margin-bottom:5px; }
+  .sb__status-cell__value { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; letter-spacing:.08em; display:flex; align-items:center; gap:8px; }
+  .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .status-dot.open   { background:var(--green); box-shadow:0 0 8px rgba(0,230,118,.5); animation:lpulse 2s ease-in-out infinite; }
+  .status-dot.closed { background:#ff3d3d; box-shadow:0 0 8px rgba(255,61,61,.5); animation:lpulse 2s ease-in-out infinite; }
+  .status-dot.warn   { background:var(--warn); box-shadow:0 0 8px rgba(255,171,0,.5); animation:lpulse 2s ease-in-out infinite; }
+  .status-dot.dim    { background:rgba(255,255,255,.15); }
+  .sb__status-cell__sub { font-size:10px; font-weight:400; color:rgba(255,255,255,.35); margin-top:3px; letter-spacing:.03em; line-height:1.3; }
+  .sb__status-cell.is-open   { background:rgba(0,230,118,.04); }
+  .sb__status-cell.is-closed { background:rgba(255,61,61,.05); }
+  .sb__status-cell.is-warn   { background:rgba(255,171,0,.04); }
+  .open-text   { color:var(--green); }
+  .closed-text { color:#ff3d3d; }
+  .warn-text   { color:var(--warn); }
 
-  /* ── STATUS ROW ── */
-  .sb__status {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-bottom: 1px solid var(--border);
-  }
-  .sb__status-cell {
-    display: flex; flex-direction: column;
-    padding: 10px 16px;
-    position: relative;
-    transition: background .3s;
-  }
-  .sb__status-cell:first-child {
-    border-right: 1px solid var(--border);
-  }
-  .sb__status-cell__label {
-    font-size: 8px; font-weight: 500; letter-spacing: .18em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.3);
-    margin-bottom: 5px;
-  }
-  .sb__status-cell__value {
-    font-family: 'Orbitron', monospace;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: .08em;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-  .status-dot.open   { background: var(--green); box-shadow: 0 0 8px rgba(0,230,118,.5); animation: livepulse 2s ease-in-out infinite; }
-  .status-dot.closed { background: #ff3d3d;      box-shadow: 0 0 8px rgba(255,61,61,.5);  animation: livepulse 2s ease-in-out infinite; }
-  .status-dot.warn   { background: var(--warn);  box-shadow: 0 0 8px rgba(255,171,0,.5);  animation: livepulse 2s ease-in-out infinite; }
-  .status-dot.dim    { background: rgba(255,255,255,.2); }
-
-  .sb__status-cell__sub {
-    font-size: 10px; font-weight: 400;
-    color: rgba(255,255,255,.35);
-    margin-top: 3px;
-    letter-spacing: .03em;
-    line-height: 1.3;
-  }
-
-  /* color tints per state */
-  .sb__status-cell.is-open   { background: rgba(0,230,118,.04); }
-  .sb__status-cell.is-closed { background: rgba(255,61,61,.05); }
-  .sb__status-cell.is-warn   { background: rgba(255,171,0,.04); }
-
-  .open-text   { color: var(--green); }
-  .closed-text { color: #ff3d3d; }
-  .warn-text   { color: var(--warn); }
-
-  /* ── TICKER ── */
-  .sb__ticker {
-    display: flex;
-    align-items: center;
-    height: 38px;
-    background: var(--bg2);
-    position: relative;
-    overflow: hidden;
-    border-top: 1px solid var(--border);
-  }
-  .sb__ticker__label {
-    flex-shrink: 0;
-    padding: 0 12px;
-    font-family: 'Orbitron', monospace;
-    font-size: 7.5px; font-weight: 700;
-    letter-spacing: .14em;
-    color: var(--orange);
-    text-transform: uppercase;
-    border-right: 1px solid var(--border);
-    height: 100%;
-    display: flex; align-items: center;
-    background: rgba(255,107,53,.06);
-    white-space: nowrap;
-  }
-  .sb__ticker__mask {
-    flex: 1; overflow: hidden; position: relative; height: 100%;
-  }
-  .sb__ticker__mask::before,
-  .sb__ticker__mask::after {
-    content:''; position:absolute; top:0; bottom:0; width:24px; z-index:2; pointer-events:none;
-  }
-  .sb__ticker__mask::before { left:0;  background:linear-gradient(90deg,var(--bg2),transparent); }
+  /* TICKER */
+  .sb__ticker { display:flex; align-items:center; height:38px; background:var(--bg2); position:relative; overflow:hidden; border-top:1px solid var(--border); }
+  .sb__ticker__label { flex-shrink:0; padding:0 12px; font-family:'Orbitron',monospace; font-size:7.5px; font-weight:700; letter-spacing:.14em; color:var(--orange); text-transform:uppercase; border-right:1px solid var(--border); height:100%; display:flex; align-items:center; background:rgba(255,107,53,.06); white-space:nowrap; }
+  .sb__ticker__mask { flex:1; overflow:hidden; position:relative; height:100%; }
+  .sb__ticker__mask::before,.sb__ticker__mask::after { content:''; position:absolute; top:0; bottom:0; width:24px; z-index:2; pointer-events:none; }
+  .sb__ticker__mask::before { left:0; background:linear-gradient(90deg,var(--bg2),transparent); }
   .sb__ticker__mask::after  { right:0; background:linear-gradient(270deg,var(--bg2),transparent); }
-
-  .sb__ticker__scroll {
-    display: flex; align-items: center;
-    white-space: nowrap; height: 100%;
-    animation: tickerScroll 35s linear infinite;
-  }
-  .sb__ticker__scroll.paused { animation-play-state: paused; }
+  .sb__ticker__scroll { display:flex; align-items:center; white-space:nowrap; height:100%; animation:tickerScroll 35s linear infinite; }
+  .sb__ticker__scroll.paused { animation-play-state:paused; }
   @keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .sb__ticker__item { display:inline-flex; align-items:center; gap:7px; padding:0 22px; font-size:13px; font-weight:400; color:var(--text); letter-spacing:.02em; }
+  .sb__ticker__item strong { font-weight:600; color:#ddeeff; }
+  .sb__ticker__item .t-date { color:rgba(255,255,255,.35); font-size:11px; }
+  .chip { display:inline-block; padding:1px 6px; border-radius:2px; font-size:8px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; flex-shrink:0; }
+  .chip--closed   { background:rgba(255,61,61,.18);  color:#ff6b6b; border:1px solid rgba(255,61,61,.3); }
+  .chip--upcoming { background:rgba(255,171,0,.15);  color:#ffab00; border:1px solid rgba(255,171,0,.3); }
+  .chip--open     { background:rgba(0,230,118,.13);  color:#00e676; border:1px solid rgba(0,230,118,.3); }
+  .sb__ticker__sep { display:inline-block; width:3px; height:3px; border-radius:50%; background:rgba(255,107,53,.4); flex-shrink:0; margin:0 2px; }
 
-  .sb__ticker__item {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 0 22px;
-    font-size: 13px; font-weight: 400;
-    color: var(--text); letter-spacing: .02em;
-  }
-  .sb__ticker__item strong { font-weight: 600; color: #ddeeff; }
-  .sb__ticker__item .t-date { color: rgba(255,255,255,.35); font-size: 11px; }
-
-  .chip {
-    display: inline-block; padding: 1px 6px; border-radius: 2px;
-    font-size: 8px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; flex-shrink: 0;
-  }
-  .chip--closed   { background:rgba(255,61,61,.18);   color:#ff6b6b; border:1px solid rgba(255,61,61,.3); }
-  .chip--upcoming { background:rgba(255,171,0,.15);   color:#ffab00; border:1px solid rgba(255,171,0,.3); }
-  .chip--open     { background:rgba(0,230,118,.13);   color:#00e676; border:1px solid rgba(0,230,118,.3); }
-
-  .sb__ticker__sep {
-    display: inline-block; width: 3px; height: 3px; border-radius: 50%;
-    background: rgba(255,107,53,.4); flex-shrink: 0; margin: 0 2px;
-  }
-
-  /* ── FOOTER ── */
-  .sb__foot {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 4px 14px;
-    border-top: 1px solid var(--border);
-    background: rgba(0,0,0,.25);
-  }
-  .sb__foot__src { font-size: 8.5px; color: rgba(255,255,255,.2); letter-spacing:.06em; }
-  .sb__foot__src a { color: rgba(255,107,53,.45); text-decoration:none; }
+  /* FOOTER */
+  .sb__foot { display:flex; align-items:center; justify-content:space-between; padding:4px 14px; border-top:1px solid var(--border); background:rgba(0,0,0,.25); }
+  .sb__foot__src { font-size:8.5px; color:rgba(255,255,255,.2); letter-spacing:.06em; }
+  .sb__foot__src a { color:rgba(255,107,53,.45); text-decoration:none; }
   .sb__foot__ts { font-family:'Orbitron',monospace; font-size:8px; color:rgba(255,255,255,.18); letter-spacing:.06em; }
 
-  /* ── LOADING ── */
   .sb__loading { display:flex; align-items:center; gap:8px; padding:0 16px; height:38px; font-size:11px; color:rgba(255,255,255,.3); }
   .spin { width:12px; height:12px; border:1.5px solid rgba(255,107,53,.2); border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg)} }
@@ -235,54 +79,37 @@
 </head>
 <body style="padding:1rem;">
 
-<div class="sb" id="sb">
-  <!-- Header -->
+<div class="sb">
   <div class="sb__head">
     <span class="sb__rocket">🚀</span>
-    <div class="sb__title">
-      Cierres en Starbase
-      <span>Boca Chica · Cameron County · Texas</span>
-    </div>
-    <div class="sb__live">
-      <span class="sb__live-dot"></span>
-      <span class="sb__live-label">En vivo</span>
-    </div>
+    <div class="sb__title">Cierres en Starbase<span>Boca Chica · Cameron County · Texas</span></div>
+    <div class="sb__live"><span class="sb__live-dot"></span><span class="sb__live-label">En vivo</span></div>
   </div>
 
-  <!-- Status: Beach + Highway -->
   <div class="sb__status">
     <div class="sb__status-cell" id="cell-playa">
       <div class="sb__status-cell__label">🏖 Playa Boca Chica</div>
-      <div class="sb__status-cell__value">
-        <span class="status-dot dim" id="dot-playa"></span>
-        <span id="val-playa">—</span>
-      </div>
-      <div class="sb__status-cell__sub" id="sub-playa"></div>
+      <div class="sb__status-cell__value"><span class="status-dot dim" id="dot-playa"></span><span id="val-playa">—</span></div>
+      <div class="sb__status-cell__sub" id="sub-playa">&nbsp;</div>
     </div>
     <div class="sb__status-cell" id="cell-road">
       <div class="sb__status-cell__label">🛣 Carr. Estatal 4</div>
-      <div class="sb__status-cell__value">
-        <span class="status-dot dim" id="dot-road"></span>
-        <span id="val-road">—</span>
-      </div>
-      <div class="sb__status-cell__sub" id="sub-road"></div>
+      <div class="sb__status-cell__value"><span class="status-dot dim" id="dot-road"></span><span id="val-road">—</span></div>
+      <div class="sb__status-cell__sub" id="sub-road">&nbsp;</div>
     </div>
   </div>
 
-  <!-- Ticker: upcoming closures -->
   <div class="sb__ticker">
     <div class="sb__ticker__label">📅 Programados</div>
     <div class="sb__ticker__mask" id="tickerMask">
-      <div class="sb__loading"><div class="spin"></div><span>Cargando cierres…</span></div>
+      <div class="sb__loading"><div class="spin"></div><span>Cargando…</span></div>
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="sb__foot">
     <span class="sb__foot__src">
       <a href="https://www.starbase.texas.gov/beach-road-access" target="_blank">starbase.texas.gov</a>
-      &nbsp;·&nbsp;
-      <a href="https://starbase.nerdpg.live" target="_blank">starbase.nerdpg.live</a>
+      &nbsp;·&nbsp;<a href="https://starbase.nerdpg.live" target="_blank">starbase.nerdpg.live</a>
     </span>
     <span class="sb__foot__ts" id="ts">—</span>
   </div>
@@ -292,7 +119,7 @@
 // ══════════════════════════════════════════════
 // 🔧 TU URL DE RAILWAY
 // ══════════════════════════════════════════════
-const BASE = 'starbase-proxy-production.up.railway.app';
+const BASE = 'https://TU-PROXY.up.railway.app';
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -327,101 +154,109 @@ function traducirFecha(f) {
     .replace(/\bto\b/gi,'—');
 }
 
-// ── Status cells ─────────────────────────────
-async function cargarEstado() {
+function renderTicker(items) {
+  const mask = document.getElementById('tickerMask');
+  if (!items || items.length === 0) {
+    mask.innerHTML = `<div class="sb__loading"><span>✅ Sin cierres programados próximamente</span></div>`;
+    return;
+  }
+  const sep  = `<span class="sb__ticker__sep"></span>`;
+  const html = (arr) => arr.map(i => `
+    <span class="sb__ticker__item">
+      <strong>${i.desc}</strong>
+      ${i.fecha ? `<span class="t-date">${i.fecha}</span>` : ''}
+      <span class="chip chip--${i.chip}">${i.chipLabel}</span>
+    </span>${sep}`).join('');
+  mask.innerHTML = `<div class="sb__ticker__scroll" id="scroll">${html(items)+html(items)}</div>`;
+  const scroll = document.getElementById('scroll');
+  scroll.style.animationDuration = Math.max(25, items.length * 14) + 's';
+  mask.addEventListener('mouseenter', () => scroll.classList.add('paused'));
+  mask.addEventListener('mouseleave', () => scroll.classList.remove('paused'));
+}
+
+// ── Carga todo desde /estado (una sola llamada) ──
+async function cargarTodo() {
   try {
     const res  = await fetch(BASE + '/estado');
     const data = await res.json();
-    console.log('Estado:', data);
+    console.log('Estado:', JSON.stringify(data));
 
-    // Beach
-    const beachLo  = (data.beach || '').toLowerCase();
+    // ── Playa ──────────────────────────────────────
+    const beachLo   = (data.beach || '').toLowerCase();
     const beachOpen = beachLo.includes('open') || beachLo.includes('abierta');
-    const cellPlaya = document.getElementById('cell-playa');
-    const dotPlaya  = document.getElementById('dot-playa');
-    const valPlaya  = document.getElementById('val-playa');
-    cellPlaya.className = 'sb__status-cell ' + (beachOpen ? 'is-open' : 'is-closed');
-    dotPlaya.className  = 'status-dot ' + (beachOpen ? 'open' : 'closed');
-    valPlaya.innerHTML  = beachOpen
-      ? '<span class="open-text">Abierta</span>'
-      : '<span class="closed-text">Cerrada</span>';
+    const cP = document.getElementById('cell-playa');
+    const dP = document.getElementById('dot-playa');
+    const vP = document.getElementById('val-playa');
+    cP.className = 'sb__status-cell ' + (beachOpen ? 'is-open' : 'is-closed');
+    dP.className = 'status-dot ' + (beachOpen ? 'open' : 'closed');
+    vP.innerHTML = beachOpen ? '<span class="open-text">Abierta</span>' : '<span class="closed-text">Cerrada</span>';
 
-    // Road
-    const cards    = data.roadCards || [];
+    // ── Carretera ──────────────────────────────────
+    const cards    = Array.isArray(data.roadCards) ? data.roadCards : [];
     const delays   = cards.filter(c => c.type === 'delay' || c.type === 'raw');
     const hasDelay = delays.length > 0;
-    const cellRoad = document.getElementById('cell-road');
-    const dotRoad  = document.getElementById('dot-road');
-    const valRoad  = document.getElementById('val-road');
-    const subRoad  = document.getElementById('sub-road');
+    const cR = document.getElementById('cell-road');
+    const dR = document.getElementById('dot-road');
+    const vR = document.getElementById('val-road');
+    const sR = document.getElementById('sub-road');
 
     if (hasDelay) {
-      cellRoad.className = 'sb__status-cell is-warn';
-      dotRoad.className  = 'status-dot warn';
-      valRoad.innerHTML  = '<span class="warn-text">Demora activa</span>';
+      cR.className = 'sb__status-cell is-warn';
+      dR.className = 'status-dot warn';
+      vR.innerHTML = '<span class="warn-text">Demora activa</span>';
       const d = delays[0];
       const parts = [];
       if (d.desc) parts.push(traducir(d.desc));
       if (d.date) parts.push(traducirFecha(d.date));
-      subRoad.textContent = parts.join('  ·  ');
+      sR.textContent = parts.join('  ·  ');
     } else {
-      cellRoad.className = 'sb__status-cell is-open';
-      dotRoad.className  = 'status-dot open';
-      valRoad.innerHTML  = '<span class="open-text">Sin demoras</span>';
-      subRoad.textContent = '';
+      cR.className = 'sb__status-cell is-open';
+      dR.className = 'status-dot open';
+      vR.innerHTML = '<span class="open-text">Sin demoras</span>';
+      sR.innerHTML = '&nbsp;';
     }
 
-  } catch(e) {
-    console.error(e);
-  }
-}
+    // ── Ticker: delays como items ──────────────────
+    // Primero intentar con roadCards del scrape,
+    // luego complementar con la API de nerdpg
+    const tickerItems = [];
 
-// ── Ticker: upcoming closures ─────────────────
-async function cargarTicker() {
-  const mask = document.getElementById('tickerMask');
-  try {
-    const res  = await fetch(BASE + '/cierres');
-    const data = await res.json();
-    const raw  = Array.isArray(data) ? data : (data.closures || data.data || []);
-
-    // Show upcoming first, then past, always at least something
-    const ahora = Date.now();
-    const sorted = [...raw].sort((a,b) => {
-      const da = new Date(a.startDate||a.start||a.date_start||0);
-      const db = new Date(b.startDate||b.start||b.date_start||0);
-      return da - db;
-    });
-    const upcoming = sorted.filter(c => new Date(c.startDate||c.start||c.date_start||0) >= ahora);
-    const items = (upcoming.length > 0 ? upcoming : sorted).slice(0, 12);
-
-    if (items.length === 0) {
-      mask.innerHTML = `<div class="sb__loading"><span>Sin cierres programados próximamente</span></div>`;
-      return;
+    // Agregar delays activos del scrape
+    for (const d of delays) {
+      tickerItems.push({
+        desc:      traducir(d.desc || 'Demora en carretera'),
+        fecha:     d.date ? traducirFecha(d.date) : null,
+        chip:      'closed',
+        chipLabel: 'HOY'
+      });
     }
 
-    const sep  = `<span class="sb__ticker__sep"></span>`;
-    const html = (arr) => arr.map(c => {
-      const desc  = traducir(c.description || c.desc || c.title || 'Cierre programado');
-      const start = fmtDate(c.startDate || c.start || c.date_start);
-      const end   = fmtDate(c.endDate   || c.end   || c.date_end);
-      const rango = [start, end].filter(Boolean).join(' — ');
-      const isPast = new Date(c.startDate||c.start||c.date_start||0) < ahora;
-      return `<span class="sb__ticker__item">
-        <strong>${desc}</strong>
-        ${rango ? `<span class="t-date">${rango}</span>` : ''}
-        <span class="chip ${isPast ? 'chip--closed' : 'chip--upcoming'}">${isPast ? 'HOY' : 'PRÓXIMO'}</span>
-      </span>${sep}`;
-    }).join('');
+    // También pedir la API de nerdpg para cierres futuros
+    try {
+      const r2   = await fetch(BASE + '/cierres');
+      const raw2 = await r2.json();
+      const list = Array.isArray(raw2) ? raw2 : (raw2.closures || raw2.data || []);
+      const ahora = Date.now();
+      for (const c of list.slice(0, 10)) {
+        const startTs = new Date(c.startDate||c.start||c.date_start||0);
+        tickerItems.push({
+          desc:      traducir(c.description||c.desc||c.title||'Cierre programado'),
+          fecha:     [fmtDate(c.startDate||c.start||c.date_start), fmtDate(c.endDate||c.end||c.date_end)].filter(Boolean).join(' — ') || null,
+          chip:      startTs < ahora ? 'closed' : 'upcoming',
+          chipLabel: startTs < ahora ? 'HOY' : 'PRÓXIMO'
+        });
+      }
+    } catch(e2) {
+      console.warn('nerdpg no disponible:', e2.message);
+    }
 
-    mask.innerHTML = `<div class="sb__ticker__scroll" id="scroll">${html(items)+html(items)}</div>`;
-    const scroll = document.getElementById('scroll');
-    scroll.style.animationDuration = Math.max(25, items.length * 12) + 's';
-    mask.addEventListener('mouseenter', () => scroll.classList.add('paused'));
-    mask.addEventListener('mouseleave', () => scroll.classList.remove('paused'));
+    renderTicker(tickerItems);
 
   } catch(e) {
-    console.error(e);
-    mask.innerHTML = `<div class="sb__loading"><span>No se pudieron cargar los cierres</span></div>`;
+    console.error('Error cargarTodo:', e);
+    // Show fallback in ticker
+    document.getElementById('tickerMask').innerHTML =
+      `<div class="sb__loading"><span>No se pudo conectar con el proxy</span></div>`;
   }
 }
 
@@ -431,10 +266,9 @@ function ts() {
     `ACT. ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;
 }
 
-cargarEstado();
-cargarTicker();
+cargarTodo();
 ts();
-setInterval(() => { cargarEstado(); cargarTicker(); ts(); }, 5 * 60 * 1000);
+setInterval(() => { cargarTodo(); ts(); }, 5 * 60 * 1000);
 </script>
 </body>
 </html>
