@@ -1,0 +1,12 @@
+{
+  "name": "starbase-proxy",
+  "version": "1.0.0",
+  "description": "Proxy CORS para cierres de carretera – Explorando el Espacio",
+  "main": "index.js",
+  "scripts": { "start": "node index.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  }
+}
