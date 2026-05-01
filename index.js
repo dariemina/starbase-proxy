@@ -33,91 +33,60 @@ app.get('/estado', async (req, res) => {
     const html = await r.text();
     const $    = cheerio.load(html);
 
-    // ── Beach status ──────────────────────────────────────────────────────
-    // Find h2 that contains "Beach Access" and get next sibling text
-    let beach = '';
-    $('h2, h3').each((_, el) => {
-      if (/beach access/i.test($(el).text())) {
-        beach = $(el).next().text().trim() || $(el).nextAll('p,div').first().text().trim();
+    // ── Dump full visible text (for debugging) ────────────────────────────
+    const fullText = $('body').text().replace(/\s+/g, ' ').trim();
+    console.log('=== FULL PAGE TEXT ===');
+    console.log(fullText.substring(0, 2000));
+    console.log('=== END ===');
+
+    // ── Beach: look for "Boca Chica Beach is" anywhere in page ───────────
+    const beachMatch = fullText.match(/Boca Chica Beach[^.!]*[.!]/i);
+    const beach = beachMatch ? beachMatch[0].trim() : '';
+    console.log('beach extracted:', beach);
+
+    // ── Road: extract everything between "Road Updates" and next section ──
+    // Collapse the full text and slice the Road Updates section
+    const roadSectionMatch = fullText.match(/Road Updates?\s*([\s\S]*?)(?:Public Notice|Previous Orders|Other Beaches|Surf Report|$)/i);
+    const roadSection = roadSectionMatch ? roadSectionMatch[1].trim() : '';
+    console.log('road section raw:', roadSection.substring(0, 500));
+
+    // Parse road cards from the section text
+    // Format: "Road Delay DESCRIPTION: X DATE: Y TO Z"
+    // Or just: "No Road Delay."
+    const roadCards = [];
+
+    if (/no road delay/i.test(roadSection)) {
+      roadCards.push({ type: 'none' });
+    } else if (/road delay/i.test(roadSection)) {
+      // Extract all Road Delay cards
+      // Each card looks like: "Road Delay DESCRIPTION: ... DATE: ..."
+      const cardPattern = /Road Delay\s+(?:DESCRIPTION:\s*([^\n]*?)\s*)?(?:DATE:\s*([^\n]*?))?(?=Road Delay|$)/gi;
+      let m;
+      while ((m = cardPattern.exec(roadSection)) !== null) {
+        roadCards.push({
+          type: 'delay',
+          desc: (m[1] || '').trim(),
+          date: (m[2] || '').trim()
+        });
       }
-    });
-
-    // ── Road updates ──────────────────────────────────────────────────────
-    // The page has cards with: title "Road Delay", description, and date
-    // Strategy: find the h2 "Road Updates", then collect ALL content until next h2
-    let roadCards = [];
-    let inRoadSection = false;
-
-    $('h2, h3').each((_, el) => {
-      const txt = $(el).text().trim().toLowerCase();
-      if (txt.includes('road update')) {
-        inRoadSection = true;
-        // Collect siblings after this h2
-        let node = $(el).next();
-        while (node.length) {
-          if (node[0].name === 'h2' || node[0].name === 'h3') break;
-
-          const nodeText = node.text().trim();
-
-          // "No Road Delay" → simple text node
-          if (/no road delay/i.test(nodeText)) {
-            roadCards.push({ type: 'none', text: nodeText });
-          }
-
-          // Card structure: look for elements containing "Road Delay" title
-          // The card has nested divs — find by scanning inner structure
-          node.find('*').addBack().each((__, inner) => {
-            const innerText = $(inner).text().trim();
-            // Title line is just "Road Delay" (short)
-            if (/^road delay$/i.test(innerText)) {
-              // Now get description and date from siblings or parent
-              const parent = $(inner).parent();
-              const fullCardText = parent.text().trim();
-              // Parse: "Road Delay DESCRIPTION: X DATE: Y TO Z"
-              const descMatch = fullCardText.match(/description[:\s]+([^\n]+?)(?=date[:\s]|$)/i);
-              const dateMatch = fullCardText.match(/date[:\s]+([^\n]+)/i);
-              if (descMatch || dateMatch) {
-                roadCards.push({
-                  type:  'delay',
-                  desc:  descMatch ? descMatch[1].trim() : '',
-                  date:  dateMatch ? dateMatch[1].trim() : ''
-                });
-              }
-            }
-          });
-
-          node = node.next();
-        }
-      }
-    });
-
-    // Deduplicate cards (same desc+date)
-    const seen = new Set();
-    roadCards = roadCards.filter(c => {
-      const key = JSON.stringify(c);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    // If nothing found, try raw text fallback
-    if (roadCards.length === 0) {
-      const bodyText = $('body').text();
-      if (/no road delay/i.test(bodyText)) {
-        roadCards.push({ type: 'none', text: 'No Road Delay.' });
-      } else if (/road delay/i.test(bodyText)) {
-        const m = bodyText.match(/road delay[\s\S]{0,300}/i);
-        roadCards.push({ type: 'raw', text: m ? m[0].trim().substring(0,200) : 'Road Delay activo' });
+      // Fallback if pattern didn't match
+      if (roadCards.length === 0) {
+        const descM = roadSection.match(/DESCRIPTION:\s*([^\n]+)/i);
+        const dateM = roadSection.match(/DATE:\s*([^\n]+)/i);
+        roadCards.push({
+          type: 'delay',
+          desc: descM ? descM[1].trim() : '',
+          date: dateM ? dateM[1].trim() : ''
+        });
       }
     }
 
-    console.log('beach:', beach);
     console.log('roadCards:', JSON.stringify(roadCards));
 
     res.json({
-      beach:     beach     || 'No disponible',
-      roadCards: roadCards,
-      source:    'https://www.starbase.texas.gov/beach-road-access',
+      beach,
+      roadCards,
+      debug: { roadSection: roadSection.substring(0, 300) },
       fetchedAt: new Date().toISOString()
     });
 
