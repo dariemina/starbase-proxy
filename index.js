@@ -22,39 +22,53 @@ async function proxyGet(url, res) {
   }
 }
 
-// ── Scraper starbase.texas.gov ────────────────────────────────────────────
 app.get('/estado', async (req, res) => {
   try {
-    const r    = await fetch('https://www.starbase.texas.gov/beach-road-access', {
+    // Scrape the HOMEPAGE — it has the full structured road delay data
+    const r    = await fetch('https://www.starbase.texas.gov/', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ExplorandoElEspacio/1.0)' }
     });
     const html = await r.text();
-
-    // Simple text extraction without cheerio — strip all HTML tags
     const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    console.log('PAGE TEXT:', text.substring(0, 2000));
 
-    // Beach status
-    const beachMatch = text.match(/Boca Chica Beach[^.!?]*/i);
-    const beach = beachMatch ? beachMatch[0].trim() : '';
+    console.log('=== PAGE TEXT SAMPLE ===');
+    // Find the Beach & Road section
+    const idx = text.indexOf('Beach & Road Access');
+    if (idx > -1) console.log('ROAD SECTION:', text.substring(idx, idx + 600));
+
+    // ── Beach ─────────────────────────────────────────────────────────────
+    // "Boca Chica Beach is open." or "Boca Chica Beach is closed."
+    const beachM = text.match(/Boca Chica Beach[^.!?]*[.!?]/i);
+    const beach  = beachM ? beachM[0].trim() : '';
     console.log('beach:', beach);
 
-    // Road section: grab everything between "Road Updates" and next section heading
-    const roadSectionMatch = text.match(/Road Updates?\s*(.*?)(?:Public Notice|Previous Orders|Other Beaches|Surf Report)/i);
-    const roadSection = roadSectionMatch ? roadSectionMatch[1].trim() : '';
-    console.log('roadSection:', roadSection.substring(0, 400));
+    // ── Road section from homepage ────────────────────────────────────────
+    // Structure: "Beach & Road Access ... Road Delay ... Description: X Date: Y ... No road delays."
+    const roadSectionM = text.match(/Beach\s*&\s*Road Access\s*([\s\S]*?)(?:View All|Building Permits)/i);
+    const roadSection  = roadSectionM ? roadSectionM[1].trim() : '';
+    console.log('roadSection:', roadSection.substring(0, 600));
 
     const roadCards = [];
-    if (/no road delay/i.test(roadSection)) {
+
+    if (!roadSection || /no road delay/i.test(roadSection)) {
       roadCards.push({ type: 'none' });
-    } else if (/road delay/i.test(roadSection)) {
-      const descM = roadSection.match(/DESCRIPTION[:\s]+([^D]+?)(?=DATE|$)/i);
-      const dateM = roadSection.match(/DATE[:\s]+([^\n]+)/i);
-      roadCards.push({
-        type: 'delay',
-        desc: descM ? descM[1].trim() : '',
-        date: dateM ? dateM[1].trim() : ''
-      });
+    } else {
+      // Extract each "Description: X Date: Y" pair
+      // Format: "Description: Production to Pad Date: February 15 11:59 PM to February 16 4:00 AM"
+      const cardRegex = /Description[:\s]+([^\n]+?)\s+Date[:\s]+([^\n]+?)(?=Description|Road Delay|No road|View All|$)/gi;
+      let m;
+      while ((m = cardRegex.exec(roadSection)) !== null) {
+        roadCards.push({
+          type: 'delay',
+          desc: m[1].trim(),
+          date: m[2].trim()
+        });
+      }
+
+      // Fallback if regex didn't match
+      if (roadCards.length === 0 && /road delay/i.test(roadSection)) {
+        roadCards.push({ type: 'delay', desc: 'Demora en carretera', date: '' });
+      }
     }
 
     console.log('roadCards:', JSON.stringify(roadCards));
