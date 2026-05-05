@@ -29,61 +29,60 @@ app.get('/estado', async (req, res) => {
     const html = await r.text();
     const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-    // ── Beach ─────────────────────────────────────────────────────────────
-    // The header banner says "Boca Chica Beach is currently closed." or "open"
-    // Also check "Beach Closure" in the notification bar
-    let beach = '';
-    const bannerClosed = /Boca Chica Beach is currently closed/i.test(text);
-    const bannerOpen   = /Boca Chica Beach is (?:currently )?open/i.test(text);
-    const hasBeachClosure = /Beach Closure/i.test(text);
-
-    if (bannerClosed || (hasBeachClosure && !bannerOpen)) {
-      beach = 'Boca Chica Beach is currently closed.';
-    } else if (bannerOpen) {
-      beach = 'Boca Chica Beach is open.';
-    } else {
-      beach = 'Boca Chica Beach is open.'; // default safe assumption
-    }
+    // ── Beach ─────────────────────────────────────────────
+    const beachClosed = /Boca Chica Beach is currently closed/i.test(text)
+                     || /Beach Closure/i.test(text.substring(0, 1000));
+    const beach = beachClosed
+      ? 'Boca Chica Beach is currently closed.'
+      : 'Boca Chica Beach is open.';
     console.log('beach:', beach);
 
-    // ── Road section ──────────────────────────────────────────────────────
-    // From homepage "Beach & Road Access" section:
-    // "Road Delay No road delays. Description: X Date: Y Description: Z Date: W"
-    // OR active: "Road Delay Description: X Date: Y"
-    const roadSectionM = text.match(/Beach\s*&\s*Road Access\s*([\s\S]*?)(?:View All|Building Permits)/i);
-    const roadSection  = roadSectionM ? roadSectionM[1].trim() : '';
-    console.log('roadSection:', roadSection.substring(0, 600));
+    // ── Active delay banner (top of page, before nav) ─────
+    // The top banner appears before "function setupMarquee"
+    const topChunk = text.substring(0, 1500);
+    const roadDelayActive = /Road Delay/i.test(topChunk) && !/Beach Closure/i.test(topChunk.substring(0, 200));
+    console.log('roadDelayActive:', roadDelayActive, '| topChunk:', topChunk.substring(0, 300));
 
-    // Check if there's an ACTIVE delay right now (header banner)
-    const activeDelayBanner = /Road Delay[\s\S]{0,200}?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.\s*\d+/i.test(
-      text.substring(0, text.indexOf('function setupMarquee') > -1 ? text.indexOf('function setupMarquee') : 500)
-    );
-    console.log('activeDelayBanner:', activeDelayBanner);
+    // ── Scheduled delays ──────────────────────────────────
+    // Find the "Beach & Road Access" widget section on homepage
+    // It contains: "Road Delay No road delays. Description: X Date: Y ..."
+    // After collapsing whitespace the text looks like:
+    // "... Road Delay No road delays. Description: Production to Pad Date: May. 5 11:59 PM to May. 6 4:00 AM Description: Pad to Production Date: May. 6 11:59 PM to May. 7 4:00 AM View All ..."
+    
+    const roadWidgetM = text.match(/Road Delay\s+No road delays\.?\s*([\s\S]*?)View All/i)
+                     || text.match(/Road Delay\s*([\s\S]*?)View All/i);
+    const roadWidget  = roadWidgetM ? roadWidgetM[1].trim() : '';
+    console.log('roadWidget:', roadWidget.substring(0, 400));
 
-    // Extract all Description/Date pairs from road section
     const scheduledDelays = [];
-    const cardRegex = /Description[:\s]+([^\n]+?)\s+Date[:\s]+([^\n]+?)(?=Description|Road Delay|No road|View All|$)/gi;
-    let m;
-    while ((m = cardRegex.exec(roadSection)) !== null) {
-      scheduledDelays.push({
-        desc: m[1].trim(),
-        date: m[2].trim()
-      });
+
+    if (roadWidget) {
+      // Match: "Description: <text> Date: <date until next Description or end>"
+      // Date format: "May. 5 11:59 PM to May. 6 4:00 AM"
+      const re = /Description:\s*(.+?)\s+Date:\s*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[^D]*?)(?=Description:|$)/gi;
+      let m;
+      while ((m = re.exec(roadWidget)) !== null) {
+        const desc = m[1].trim();
+        const date = m[2].trim().replace(/\s+/g, ' ');
+        if (desc) scheduledDelays.push({ desc, date });
+      }
+
+      // Fallback: simpler split if above didn't work
+      if (scheduledDelays.length === 0) {
+        const descMatches = [...roadWidget.matchAll(/Description:\s*(.+?)(?=Date:|Description:|$)/gi)];
+        const dateMatches = [...roadWidget.matchAll(/Date:\s*(.+?)(?=Description:|$)/gi)];
+        for (let i = 0; i < descMatches.length; i++) {
+          scheduledDelays.push({
+            desc: descMatches[i][1].trim(),
+            date: dateMatches[i] ? dateMatches[i][1].trim() : ''
+          });
+        }
+      }
     }
+
     console.log('scheduledDelays:', JSON.stringify(scheduledDelays));
 
-    // Active road delay = banner says so OR current time falls within a scheduled window
-    // We pass both active status and scheduled list to the widget
-    const roadDelayActive = activeDelayBanner || /Road Delay(?!\s*No road)/i.test(
-      text.substring(text.search(/Beach\s*&\s*Road Access/i), text.search(/View All/i))
-    );
-
-    res.json({
-      beach,
-      roadDelayActive: scheduledDelays.length > 0 && activeDelayBanner,
-      scheduledDelays,
-      fetchedAt: new Date().toISOString()
-    });
+    res.json({ beach, roadDelayActive, scheduledDelays, fetchedAt: new Date().toISOString() });
 
   } catch (err) {
     console.error('Scrape error:', err.message);
