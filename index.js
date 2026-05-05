@@ -17,63 +17,73 @@ async function proxyGet(url, res) {
     const data = await r.json();
     res.json(data);
   } catch (err) {
-    console.error('Proxy error:', err.message);
     res.status(502).json({ error: 'No se pudieron obtener los datos.' });
   }
 }
 
 app.get('/estado', async (req, res) => {
   try {
-    // Scrape the HOMEPAGE — it has the full structured road delay data
     const r    = await fetch('https://www.starbase.texas.gov/', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ExplorandoElEspacio/1.0)' }
     });
     const html = await r.text();
     const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-    console.log('=== PAGE TEXT SAMPLE ===');
-    // Find the Beach & Road section
-    const idx = text.indexOf('Beach & Road Access');
-    if (idx > -1) console.log('ROAD SECTION:', text.substring(idx, idx + 600));
-
     // ── Beach ─────────────────────────────────────────────────────────────
-    // "Boca Chica Beach is open." or "Boca Chica Beach is closed."
-    const beachM = text.match(/Boca Chica Beach[^.!?]*[.!?]/i);
-    const beach  = beachM ? beachM[0].trim() : '';
+    // The header banner says "Boca Chica Beach is currently closed." or "open"
+    // Also check "Beach Closure" in the notification bar
+    let beach = '';
+    const bannerClosed = /Boca Chica Beach is currently closed/i.test(text);
+    const bannerOpen   = /Boca Chica Beach is (?:currently )?open/i.test(text);
+    const hasBeachClosure = /Beach Closure/i.test(text);
+
+    if (bannerClosed || (hasBeachClosure && !bannerOpen)) {
+      beach = 'Boca Chica Beach is currently closed.';
+    } else if (bannerOpen) {
+      beach = 'Boca Chica Beach is open.';
+    } else {
+      beach = 'Boca Chica Beach is open.'; // default safe assumption
+    }
     console.log('beach:', beach);
 
-    // ── Road section from homepage ────────────────────────────────────────
-    // Structure: "Beach & Road Access ... Road Delay ... Description: X Date: Y ... No road delays."
+    // ── Road section ──────────────────────────────────────────────────────
+    // From homepage "Beach & Road Access" section:
+    // "Road Delay No road delays. Description: X Date: Y Description: Z Date: W"
+    // OR active: "Road Delay Description: X Date: Y"
     const roadSectionM = text.match(/Beach\s*&\s*Road Access\s*([\s\S]*?)(?:View All|Building Permits)/i);
     const roadSection  = roadSectionM ? roadSectionM[1].trim() : '';
     console.log('roadSection:', roadSection.substring(0, 600));
 
-    const roadCards = [];
+    // Check if there's an ACTIVE delay right now (header banner)
+    const activeDelayBanner = /Road Delay[\s\S]{0,200}?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.\s*\d+/i.test(
+      text.substring(0, text.indexOf('function setupMarquee') > -1 ? text.indexOf('function setupMarquee') : 500)
+    );
+    console.log('activeDelayBanner:', activeDelayBanner);
 
-    if (!roadSection || /no road delay/i.test(roadSection)) {
-      roadCards.push({ type: 'none' });
-    } else {
-      // Extract each "Description: X Date: Y" pair
-      // Format: "Description: Production to Pad Date: February 15 11:59 PM to February 16 4:00 AM"
-      const cardRegex = /Description[:\s]+([^\n]+?)\s+Date[:\s]+([^\n]+?)(?=Description|Road Delay|No road|View All|$)/gi;
-      let m;
-      while ((m = cardRegex.exec(roadSection)) !== null) {
-        roadCards.push({
-          type: 'delay',
-          desc: m[1].trim(),
-          date: m[2].trim()
-        });
-      }
-
-      // Fallback if regex didn't match
-      if (roadCards.length === 0 && /road delay/i.test(roadSection)) {
-        roadCards.push({ type: 'delay', desc: 'Demora en carretera', date: '' });
-      }
+    // Extract all Description/Date pairs from road section
+    const scheduledDelays = [];
+    const cardRegex = /Description[:\s]+([^\n]+?)\s+Date[:\s]+([^\n]+?)(?=Description|Road Delay|No road|View All|$)/gi;
+    let m;
+    while ((m = cardRegex.exec(roadSection)) !== null) {
+      scheduledDelays.push({
+        desc: m[1].trim(),
+        date: m[2].trim()
+      });
     }
+    console.log('scheduledDelays:', JSON.stringify(scheduledDelays));
 
-    console.log('roadCards:', JSON.stringify(roadCards));
+    // Active road delay = banner says so OR current time falls within a scheduled window
+    // We pass both active status and scheduled list to the widget
+    const roadDelayActive = activeDelayBanner || /Road Delay(?!\s*No road)/i.test(
+      text.substring(text.search(/Beach\s*&\s*Road Access/i), text.search(/View All/i))
+    );
 
-    res.json({ beach, roadCards, fetchedAt: new Date().toISOString() });
+    res.json({
+      beach,
+      roadDelayActive: scheduledDelays.length > 0 && activeDelayBanner,
+      scheduledDelays,
+      fetchedAt: new Date().toISOString()
+    });
 
   } catch (err) {
     console.error('Scrape error:', err.message);
